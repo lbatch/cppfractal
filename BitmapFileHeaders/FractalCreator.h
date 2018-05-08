@@ -38,6 +38,7 @@ private:
   void drawFractal();
   void writeBitmap(string name);
   void calculateRangeTotals();
+  int getRange(int iterations) const;
 public:
   FractalCreator(int width, int height);
   virtual ~FractalCreator();

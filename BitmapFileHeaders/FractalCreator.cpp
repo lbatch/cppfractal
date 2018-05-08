@@ -1,15 +1,13 @@
 // FractalCreator.cpp
 
 #include "FractalCreator.h"
-#include <iostream>
+#include <assert.h>
 
 using namespace std;
 
 namespace fractalproj {
 
 void FractalCreator::run(string name) {
-  addZoom(Zoom(295, _height-202, 0.1));
-  addZoom(Zoom(312, _height-304, 0.1));
   calculateIterations();
   calculateTotalIterations();
   calculateRangeTotals();
@@ -91,34 +89,58 @@ void FractalCreator::calculateRangeTotals() {
 
 }
 
+int FractalCreator::getRange(int iterations) const {
+  int range = 0;
+
+  for(int i=1; i < _ranges.size(); i++)
+  {
+    range = i;
+    
+    if(_ranges[i] > iterations) {
+      break;
+    }
+  }
+
+  range--;
+
+  assert(range > -1);
+  assert(range < _ranges.size());
+
+  return range;
+}
+
 void FractalCreator::drawFractal() {
   
-  RGB startColor(0, 0, 0);
-  RGB endColor(0, 0, 255);
-  RGB colorDiff = endColor - startColor;
-
   for(int y = 0; y < _height; y++)
   {
     for(int x = 0; x < _width; x++)
     {
+      int iterations = _fractal[y*_width + x];
+
+      int range = getRange(iterations);
+      int rangeTotal = _rangeTotals[range];
+      int rangeStart = _ranges[range];     
+ 
+      RGB& startColor = _colors[range];
+      RGB& endColor = _colors[range+1];
+      RGB colorDiff = endColor - startColor;
+
       uint8_t red = 0;
       uint8_t green = 0;
       uint8_t blue = 0;
 
-      int iterations = _fractal[y*_width + x];
-
       if(iterations != Mandelbrot::MAX_ITERATIONS)
       {
-        double hue = 0.0;
+        int totalPixels = 0;
 
-        for(int i = 0; i <= iterations; i++)
+        for(int i = rangeStart; i <= iterations; i++)
         {
-          hue += ((double)_histogram[i])/_total;
+          totalPixels += _histogram[i];
         }
         
-        red = startColor.r + colorDiff.r*hue;
-        green = startColor.g + colorDiff.g*hue;
-        blue = startColor.b + colorDiff.b*hue;
+        red = startColor.r + colorDiff.r*((double)totalPixels/rangeTotal);
+        green = startColor.g + colorDiff.g*((double)totalPixels/rangeTotal);
+        blue = startColor.b + colorDiff.b*((double)totalPixels/rangeTotal);
       
       }
        
