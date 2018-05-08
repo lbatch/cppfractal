@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <memory>
 #include <math.h>
+#include <vector>
 #include "Zoom.h"
 #include "ZoomList.h"
 #include "Bitmap.h"
@@ -26,17 +27,23 @@ private:
   unique_ptr<int[]> _fractal;
   Bitmap _bitmap;
   ZoomList _zoomList;
+  
+  vector<int> _ranges;
+  vector<RGB> _colors;
+  vector<int> _rangeTotals;
+  bool _bGotFirstRange{false};
 private:
   void calculateIterations();
   void calculateTotalIterations();
   void drawFractal();
   void writeBitmap(string name);
+  void calculateRangeTotals();
 public:
   FractalCreator(int width, int height);
   virtual ~FractalCreator();
   void run(string name);
   void addZoom(const Zoom& zoom);
-
+  void addRange(double rangeEnd, const RGB& rgb);
 };
 
 
