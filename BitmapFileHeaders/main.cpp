@@ -1,40 +1,26 @@
 #include <iostream>
-#include <cstdint>
-#include "Mandelbrot.h"
-#include "Bitmap.h"
+#include "FractalCreator.h"
+#include "RGB.h"
+#include "Zoom.h"
 
 using namespace fractalproj;
 using namespace std;
 
 int main(){
   
-  int const WIDTH = 800;
-  int const HEIGHT = 600;
-  Bitmap bitmap(WIDTH, HEIGHT);
+  RGB rgb1(4,5,6);
+  RGB rgb2(1,2,3);
 
-  double min = 999999;
-  double max = -999999;
+  RGB rgb3 = rgb1 - rgb2;
 
-  for(int y = 0; y < HEIGHT; y++)
-  {
-    for(int x = 0; x < WIDTH; x++)
-    {
-      double xFractal = (x - WIDTH/2 - 200) * (2.0/WIDTH);
-      double yFractal = (y - HEIGHT/2 - 200) * (2.0/HEIGHT);
+  cout << rgb3.r << ", " << rgb3.g << ", " << rgb3.b << endl;
 
-      int iterations = Mandelbrot::getIterations(xFractal, yFractal);
-      uint8_t red = (uint8_t)(256 * (double)iterations/Mandelbrot::MAX_ITERATIONS);
+  FractalCreator fractalCreator(800, 600);
 
-      bitmap.setPixel(x, y, red, red, red);
-     
-      if(red < min) min = red;
-      if(red > max) max = red; 
-    }
-  }
-  
-  cout << min << ", " << max << endl;
-  
-  bitmap.write("test.bmp");
+  fractalCreator.addZoom(Zoom(295, 202, 0.1));
+  fractalCreator.addZoom(Zoom(312, 304, 0.1));
+ 
+  fractalCreator.run("test.bmp");
 
   cout << "Finished" << endl;
   return 0;
